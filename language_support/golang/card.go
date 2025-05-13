@@ -1,15 +1,9 @@
 package golang
 
-import (
-	"net/http"
-
-	"google.golang.org/protobuf/types/known/anypb"
-)
-
 type Card struct {
 	name    string
 	in, out map[string]any
-	run     func(map[string]any) map[string]any
+	run     func(map[string]any) (map[string]any, error)
 }
 
 func NewCard(name string) *Card {
@@ -19,25 +13,21 @@ func NewCard(name string) *Card {
 	}
 }
 
-func (c *Card) TakesIn(name string, value anypb.Any) *Card {
-	var err error
-	c.in[name], err = anypb.New(v)
+// arg type/default values this card takes
+func (c *Card) TakesIn(name string, value any) *Card {
+	c.in[name] = value
 	return c
 }
 
+// values which this card spits out
 func (c *Card) SpitsOut(name string, v any) *Card {
 	c.out[name] = v
 	return c
 }
 
-func (c *Card) Runs(run func(in map[string]any) (out map[string]any)) *Card {
+// passed fn which runs when this card is called with arg 'in' which you defined using 'TakesIn' method and
+// returns the values you defined using 'SpitsOut' method
+func (c *Card) Runs(run func(in map[string]any) (map[string]any, error)) *Card {
 	c.run = run
 	return c
-}
-
-func (c *Card) attachCardToServer(s *http.ServeMux) error {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/in")
-	endpoint := "/" + c.name
-	s.Handle(endpoint, http.StripPrefix(endpoint, mux))
 }

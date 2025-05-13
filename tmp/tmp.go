@@ -3,25 +3,24 @@ package tmp
 import (
 	"fmt"
 
-	"github.com/ondbyte/pipeman/card"
-	"google.golang.org/protobuf/types/known/wrapperspb"
+	"github.com/ondbyte/pipeman/language_support/golang"
 )
 
 func main() {
-	card.RunCardsProgram(
+	golang.RunCardsProgram(
 		loginCard(),
 	)
 }
 
-func loginCard() *card.Card {
-	return card.NewCard().
-		TakesIn("username", wrapperspb.String("")).
+func loginCard() *golang.Card {
+	return golang.NewCard("login-to-your-service").
+		TakesIn("username", "").
 		TakesIn("password", "").
 		SpitsOut("token", "").
 		Runs(
-			func(in map[string]any) (out map[string]any) {
-				username := in["username"].(*wrapperspb.StringValue)
-				password := in["password"]
+			func(in map[string]any) (out map[string]any, err error) {
+				username := in["username"].(string)
+				password := in["password"].(string)
 				fmt.Println(username, password)
 				// do any work
 				out = map[string]any{}
@@ -29,5 +28,4 @@ func loginCard() *card.Card {
 				return
 			},
 		)
-
 }

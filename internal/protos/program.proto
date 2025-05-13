@@ -1,39 +1,29 @@
 syntax = "proto3";
 
-import "google/protobuf/any.proto";
+import "google/protobuf/struct.proto";
 
 package program;
 
 option go_package = "github.com/ondbyte/pipeman/internal/protos/go";
 
-message CardInput {
-    map<string,google.protobuf.Any> entries = 1;
-}
-
-message CardOutput {
-    map<string,google.protobuf.Any> entries = 1;
-}
-
 message Card {
     string name = 1;
-    CardInput in=2;
-    CardOutput out=3;
+    google.protobuf.Struct in=2;
+    google.protobuf.Struct out=3;
 }
 
 message Cards {
     repeated Card cards = 1;
 }
 
-message EmptyReq {
-
-}
+message EmptyReq {}
 
 message CardInputWithCardName {
     string card = 1;
-    CardInput input = 2;
+    google.protobuf.Struct input = 2;
 }
 
 service Program {
     rpc GetSupportedCards(EmptyReq) returns (Cards);
-    rpc RunCard(CardInputWithCardName) returns (CardOutput);
+    rpc RunCard(CardInputWithCardName) returns (google.protobuf.Struct);
 }

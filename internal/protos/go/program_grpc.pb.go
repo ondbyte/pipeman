@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	structpb "google.golang.org/protobuf/types/known/structpb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -28,7 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProgramClient interface {
 	GetSupportedCards(ctx context.Context, in *EmptyReq, opts ...grpc.CallOption) (*Cards, error)
-	RunCard(ctx context.Context, in *CardInputWithCardName, opts ...grpc.CallOption) (*CardOutput, error)
+	RunCard(ctx context.Context, in *CardInputWithCardName, opts ...grpc.CallOption) (*structpb.Struct, error)
 }
 
 type programClient struct {
@@ -49,9 +50,9 @@ func (c *programClient) GetSupportedCards(ctx context.Context, in *EmptyReq, opt
 	return out, nil
 }
 
-func (c *programClient) RunCard(ctx context.Context, in *CardInputWithCardName, opts ...grpc.CallOption) (*CardOutput, error) {
+func (c *programClient) RunCard(ctx context.Context, in *CardInputWithCardName, opts ...grpc.CallOption) (*structpb.Struct, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CardOutput)
+	out := new(structpb.Struct)
 	err := c.cc.Invoke(ctx, Program_RunCard_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -64,7 +65,7 @@ func (c *programClient) RunCard(ctx context.Context, in *CardInputWithCardName, 
 // for forward compatibility.
 type ProgramServer interface {
 	GetSupportedCards(context.Context, *EmptyReq) (*Cards, error)
-	RunCard(context.Context, *CardInputWithCardName) (*CardOutput, error)
+	RunCard(context.Context, *CardInputWithCardName) (*structpb.Struct, error)
 	mustEmbedUnimplementedProgramServer()
 }
 
@@ -78,7 +79,7 @@ type UnimplementedProgramServer struct{}
 func (UnimplementedProgramServer) GetSupportedCards(context.Context, *EmptyReq) (*Cards, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSupportedCards not implemented")
 }
-func (UnimplementedProgramServer) RunCard(context.Context, *CardInputWithCardName) (*CardOutput, error) {
+func (UnimplementedProgramServer) RunCard(context.Context, *CardInputWithCardName) (*structpb.Struct, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RunCard not implemented")
 }
 func (UnimplementedProgramServer) mustEmbedUnimplementedProgramServer() {}
