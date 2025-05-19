@@ -4,7 +4,7 @@
 // 	protoc        v4.25.7
 // source: program.proto
 
-package _go
+package protos
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -232,7 +232,7 @@ const file_program_proto_rawDesc = "" +
 	"\x05input\x18\x02 \x01(\v2\x17.google.protobuf.StructR\x05input2\x85\x01\n" +
 	"\aProgram\x126\n" +
 	"\x11GetSupportedCards\x12\x11.program.EmptyReq\x1a\x0e.program.Cards\x12B\n" +
-	"\aRunCard\x12\x1e.program.CardInputWithCardName\x1a\x17.google.protobuf.StructB/Z-github.com/ondbyte/pipeman/internal/protos/gob\x06proto3"
+	"\aRunCard\x12\x1e.program.CardInputWithCardName\x1a\x17.google.protobuf.StructB3Z1github.com/ondbyte/pipeman/internal/protos/protosb\x06proto3"
 
 var (
 	file_program_proto_rawDescOnce sync.Once

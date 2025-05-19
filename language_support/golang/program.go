@@ -68,20 +68,37 @@ func newProgram(cards ...*Card) *program {
 	return prgm
 }
 
+type ProgramData struct {
+	Name string `json:"name"`
+	Port int    `json:"port"`
+}
+
+var (
+	startedByKey         = "STARTED_BY"
+	startedByVal         = "pipeman-random-yadhu"
+	StartedByEnvKeyValue = fmt.Sprintf("%s=%s", startedByKey, startedByVal)
+)
+
 // takes your cards and runs them as single go program,
 // you should call this from your main, no other requirements
-func RunCardsProgram(cards ...*Card) error {
-	port, ok := os.LookupEnv("PORT")
-	if !ok {
-		return fmt.Errorf("PORT environment variable not set")
+func RunCardsProgram(programName string, cards ...*Card) error {
+	if os.Getenv(startedByKey) != startedByVal {
+		// not started by pipeman
+		return fmt.Errorf("exiting because not started by pipeman")
 	}
 	s := grpc.NewServer()
 	protos.RegisterProgramServer(s, newProgram(cards...))
 
-	lis, err := net.Listen("tcp", ":"+port)
+	lis, err := net.Listen("tcp", ":0")
 	if err != nil {
 		return fmt.Errorf("failed to listen: %v", err)
 	}
+
+	// printout the configuration of this program so the started (pipeman) can use it
+	// only thing RunCardsProgram should print
+	// otherwise pipeman would behave differently
+	fmt.Println(&ProgramData{Name: programName, Port: lis.Addr().(*net.TCPAddr).Port})
+
 	if err := s.Serve(lis); err != nil {
 		return fmt.Errorf("failed to serve: %v", err)
 	}

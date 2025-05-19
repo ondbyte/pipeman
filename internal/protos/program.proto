@@ -4,7 +4,7 @@ import "google/protobuf/struct.proto";
 
 package program;
 
-option go_package = "github.com/ondbyte/pipeman/internal/protos/go";
+option go_package = "github.com/ondbyte/pipeman/internal/protos/protos";
 
 message Card {
     string name = 1;
