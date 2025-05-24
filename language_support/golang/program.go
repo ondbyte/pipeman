@@ -3,7 +3,6 @@ package golang
 import (
 	"context"
 	"fmt"
-	"net"
 	"os"
 
 	protos "github.com/ondbyte/pipeman/internal/protos/go"
@@ -79,9 +78,16 @@ var (
 	StartedByEnvKeyValue = fmt.Sprintf("%s=%s", startedByKey, startedByVal)
 )
 
+func StartedByPipeman() {
+	err := os.Setenv(startedByKey, startedByVal)
+	if err != nil {
+		panic(err)
+	}
+}
+
 // takes your cards and runs them as single go program,
 // you should call this from your main, no other requirements
-func RunCardsProgram(programName string, cards ...*Card) error {
+func RunCardsProgram(r, w *os.File, programName string, cards ...*Card) error {
 	if os.Getenv(startedByKey) != startedByVal {
 		// not started by pipeman
 		return fmt.Errorf("exiting because not started by pipeman")
@@ -89,15 +95,9 @@ func RunCardsProgram(programName string, cards ...*Card) error {
 	s := grpc.NewServer()
 	protos.RegisterProgramServer(s, newProgram(cards...))
 
-	lis, err := net.Listen("tcp", ":0")
-	if err != nil {
-		return fmt.Errorf("failed to listen: %v", err)
+	lis := &StdioListener{
+		r: r, w: w,
 	}
-
-	// printout the configuration of this program so the started (pipeman) can use it
-	// only thing RunCardsProgram should print
-	// otherwise pipeman would behave differently
-	fmt.Println(&ProgramData{Name: programName, Port: lis.Addr().(*net.TCPAddr).Port})
 
 	if err := s.Serve(lis); err != nil {
 		return fmt.Errorf("failed to serve: %v", err)
